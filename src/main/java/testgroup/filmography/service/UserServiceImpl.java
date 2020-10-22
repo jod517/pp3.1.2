@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import testgroup.filmography.model.User;
-import testgroup.filmography.userDAO.UserDao;
+
 
 import java.util.List;
 
@@ -15,48 +15,47 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService, UserDetailsService {
 
-    private final UserDao userDao;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao) {
-        this.userDao = userDao;
-    }
+    private  UserRepository userRepository;
 
     @Override
     @Transactional
     public void createUser(User user) {
-        userDao.createUser(user);
+        userRepository.saveAndFlush(user);
     }
 
     @Override
     public List<User> getAllUsers() {
-        return userDao.getAllUsers();
+        return userRepository.findAll();
     }
 
     @Override
     public User getUserById(long id) {
-        return userDao.getUserById(id);
+        return userRepository.findById(id).get();
     }
 
     @Override
     public User getUserByName(String name) {
-        return userDao.getUserByName(name);
+        return userRepository.findByName(name);
     }
 
     @Override
     @Transactional
     public void updateUser(User user) {
-        userDao.updateUser(user);
+        userRepository.saveAndFlush(user);
     }
 
     @Override
     @Transactional
     public void deleteUser(long id) {
-        userDao.deleteUser(id);
+        userRepository.deleteById(id);
     }
 
     @Override
     public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-        return userDao.getUserByName(name);
+        User user =  userRepository.findByName(name);
+        user.getAuthorities().size();
+        return user;
     }
 }
